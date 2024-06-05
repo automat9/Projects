@@ -33,3 +33,4 @@ def make_graph(stock_data, revenue_data, stock):
     title=stock,
     xaxis_rangeslider_visible=True)
     fig.show()
+30min
