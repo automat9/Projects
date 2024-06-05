@@ -34,10 +34,25 @@ def make_graph(stock_data, revenue_data, stock):
     xaxis_rangeslider_visible=True)
     fig.show()
 
-#Q1.
+# Question 1
 tesla = yf.Ticker("TSLA")
 tesla_data = tesla.history(period="max")
 tesla_data.reset_index(inplace=True)
 tesla_data.head()
 
-20min
+
+# Question 2
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/revenue.htm"
+html_data = requests.get(url).text
+soup = BeautifulSoup(html_data)
+tesla_revenue pd.read_html(url)[1]
+tesla_revenue.columns = ["Date", "Revenue"] # changing column names 
+tesla_revenue.head()
+
+tesla_revenue["Revenue"] = tesla_revenue['Revenue'].str.replace(',|\$',"") # copied, removes the comma and dollar sign from the revenue column
+
+tesla_revenue.dropna(inplace=True)
+
+tesla_revenue = tesla_revenue[tesla_revenue['Revenue'] != ""] # both lines copied, they remove null or empty strings in the Revenue column
+
+
