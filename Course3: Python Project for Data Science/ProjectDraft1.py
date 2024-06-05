@@ -33,4 +33,11 @@ def make_graph(stock_data, revenue_data, stock):
     title=stock,
     xaxis_rangeslider_visible=True)
     fig.show()
-30min
+
+#Q1.
+tesla = yf.Ticker("TSLA")
+tesla_data = tesla.history(period="max")
+tesla_data.reset_index(inplace=True)
+tesla_data.head()
+
+20min
