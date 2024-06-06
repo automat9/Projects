@@ -55,4 +55,5 @@ tesla_revenue.dropna(inplace=True)
 
 tesla_revenue = tesla_revenue[tesla_revenue['Revenue'] != ""] # both lines copied, they remove null or empty strings in the Revenue column
 
+24min
 
