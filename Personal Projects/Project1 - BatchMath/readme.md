@@ -1,4 +1,4 @@
-This is a simple calculator that can perform basic arithmetic operations on thousands of numbers at once.
+This is a simple calculator that can perform basic arithmetic operations on thousands of numbers simultaneously.
 
 Step 1: Select the operation you wish to perform.
 
