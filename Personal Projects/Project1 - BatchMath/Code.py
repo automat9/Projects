@@ -16,7 +16,7 @@ while True:
         print("Invalid choice. Please select a valid operation.")
 
 x = int(input(f"How many numbers would you like to {choice}: "))
-y = float(input(f"Enter the number to {choice} by: "))
+y = float(input(f"Enter a number to {choice} by: "))
 
 result_list = []
 symbol = operations[choice]
