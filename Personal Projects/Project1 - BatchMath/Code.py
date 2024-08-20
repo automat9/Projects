@@ -1,14 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[9]:
-
-
-# Pre-defined list of operations
-operations = ["multiply", "divide", "add", "subtract"]
-
-# Map operations to their respective symbols
-operation_symbols = {
+# Define operations and their symbols
+operations = {
     "multiply": "*",
     "divide": "/",
     "add": "+",
@@ -16,7 +7,6 @@ operation_symbols = {
 }
 
 while True:
-    # Ask the user to choose an operation
     choice = input("Choose an operation: multiply, divide, add, subtract: ").lower()
 
     if choice in operations:
@@ -29,7 +19,7 @@ x = int(input(f"How many numbers would you like to {choice}: "))
 y = float(input(f"Enter the number to {choice} by: "))
 
 result_list = []
-symbol = operation_symbols[choice]  # Get the symbol for the chosen operation
+symbol = operations[choice]
 
 for i in range(1, x + 1):
     if choice == "multiply":
@@ -45,10 +35,5 @@ for i in range(1, x + 1):
 # Print the results
 for item in result_list:
     print(item)
-
-
-# In[ ]:
-
-
 
 
