@@ -1,55 +1,63 @@
 import secrets
 import string
 import random
-import os
+import tkinter as tk
+from tkinter import messagebox, filedialog
 
-# Initialize an empty list to store the password entries
+# Generate a random password
+def generate_password(length=5):
+    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
+    password = ''.join(secrets.choice(chars) for _ in range(length * 4))
+    return ''.join(random.sample(password, len(password)))
+
+# Add the generated password entry to the list and display it
+def add_entry():
+    name, login = entry_name.get(), entry_login.get()
+    if not name or not login:
+        return messagebox.showwarning("Input Error", "Please enter both Name and Login.")
+    
+    password = generate_password()
+    password_entries.append((name, login, password))
+    
+    # Update the display area
+    display_area.insert(tk.END, f"Name: {name}\nLogin: {login}\nPassword: {password}\n{'-'*35}\n")
+    entry_name.delete(0, tk.END)
+    entry_login.delete(0, tk.END)
+
+# Save all the password entries to a file
+def save_entries():
+    if not password_entries:
+        return messagebox.showwarning("No Entries", "There are no entries to save.")
+    
+    file_path = filedialog.asksaveasfilename(initialfile="Passwords.txt", defaultextension=".txt",
+                                             filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+    if not file_path: return
+
+    with open(file_path, 'w') as f:
+        for name, login, password in password_entries:
+            f.write(f"Name: {name}\nLogin: {login}\nPassword: {password}\n{'-'*35}\n")
+
+    messagebox.showinfo("Save Successful", f"Entries have been saved to '{file_path}'")
+
+# Initialise the main application window
+app = tk.Tk()
+app.title("Secure Pass Generator")
 password_entries = []
 
-while True:
-    # Ask for the name of the entry
-    name = input("Enter the name for this entry: ")
+# User input and display widgets
+tk.Label(app, text="Name:").grid(row=0, column=0, padx=5, pady=5)
+entry_name = tk.Entry(app, width=30)
+entry_name.grid(row=0, column=1, padx=5, pady=5)
 
-    # Always ask for the login associated with this entry
-    login = input("Enter the login: ")
+tk.Label(app, text="Login:").grid(row=1, column=0, padx=5, pady=5)
+entry_login = tk.Entry(app, width=30)
+entry_login.grid(row=1, column=1, padx=5, pady=5)
 
-    # How many characters of each type for the password
-    count = 5
+tk.Button(app, text="Generate and Add Entry", command=add_entry).grid(row=2, columnspan=2, pady=10)
+display_area = tk.Text(app, height=15, width=50, wrap="word")
+display_area.grid(row=3, columnspan=2, pady=10)
 
-    # Generate the components of the password
-    password = (
-        ''.join(secrets.choice(string.ascii_uppercase) for _ in range(count)) +
-        ''.join(secrets.choice(string.ascii_lowercase) for _ in range(count)) +
-        ''.join(secrets.choice(string.digits) for _ in range(count)) +
-        ''.join(secrets.choice(string.punctuation) for _ in range(count))
-    )
+tk.Button(app, text="Save Entries", command=save_entries).grid(row=4, columnspan=2, pady=10)
 
-    # Shuffle the password to ensure randomness
-    password = ''.join(random.sample(password, len(password)))
-
-    # Inform the user of the generated password
-    print("Your generated random password:", password)
-
-    # Store the entry in the list as a tuple
-    password_entries.append((name, login, password))
-
-    # Ask if the user wants to generate another password
-    another = input("Would you like to generate another entry? (yes/no): ").strip().lower()
-    if another != 'yes':
-        break
-
-# Get the path to the user's desktop
-desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-
-# Define the full path for the text file on the desktop
-file_path = os.path.join(desktop_path, 'passwords.txt')
-
-# Write the entries to the text file in the specified format
-with open(file_path, 'w') as f:
-    for name, login, password in password_entries:
-        f.write(f"Name: {name}\n")
-        f.write(f"Login: {login}\n")
-        f.write(f"Password: {password}\n")
-        f.write("-----------------------------------\n")
-
-print(f"\nEntries have been saved to '{file_path}'")
+# Start the GUI event loop
+app.mainloop()
