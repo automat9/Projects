@@ -1,7 +1,7 @@
 import pandas as pd
 
-# Load data from GitHub URL and reorder columns
-url = "https://github.com/automat9/Business-Analytics/raw/aadac54eaf6f4ca76c4970a1d317ad355a7fe051/Semester%201/Programming%20for%20Business%20Analytics/Midterm%20Project/Coffee_company.csv"
+# Load data from new GitHub URL and reorder columns
+url = "https://github.com/automat9/Projects/raw/50440f4e43b70aba6f5743102f7d73455112f43f/University%20Projects/Programming%20for%20Business%20Analytics/coffee_company_dataset.csv"
 data = pd.read_csv(url)
 
 new_order = [
@@ -19,7 +19,6 @@ data['Profit'] = pd.to_numeric(data[' Profit '].replace('[\$,]', '', regex=True)
 product_performance = data.groupby(data[' Product '].str.strip()).agg({'Sales': 'sum', 'Profit': 'sum'}).reset_index()
 
 # Display each product's sales and profit
-# Note to self: "_, row" is commonly used in loops to indicate that we are only interested in the row content, not the index
 for _, row in product_performance.iterrows():
     print(f"Product: {row[' Product ']}, Sales: £{row['Sales']}, Profit: £{row['Profit']}")
 
