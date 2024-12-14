@@ -1,14 +1,13 @@
 import pandas as pd
 
 # Load data from new GitHub URL and reorder columns
-url = "https://github.com/automat9/Projects/raw/50440f4e43b70aba6f5743102f7d73455112f43f/University%20Projects/Programming%20for%20Business%20Analytics/coffee_company_dataset.csv"
-data = pd.read_csv(url)
+data = pd.read_csv(r'https://github.com/automat9/Projects/raw/50440f4e43b70aba6f5743102f7d73455112f43f/University%20Projects/Programming%20for%20Business%20Analytics/coffee_company_dataset.csv')
 
 new_order = [
     'Date', 'Year', 'Month Number', ' Month Name ', 'Segment', 'Country', ' Product ', 
     ' Discount Band ', 'Units Sold', ' Manufacturing Price ', ' Sale Price ', 
-    ' Gross Sales ', ' Discounts ', '  Sales ', ' COGS ', ' Profit '
-]
+    ' Gross Sales ', ' Discounts ', '  Sales ', ' COGS ', ' Profit ']
+
 sorted_data = data[new_order]
 
 # Clean and convert 'Sales' and 'Profit' columns
