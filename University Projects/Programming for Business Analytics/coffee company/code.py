@@ -18,7 +18,7 @@ data.rename(columns={'Sales':'Net Sales ($)'}, inplace = True)
 # replace "-" with "N/A" in the discount column for clarity
 data['Discounts'] = data['Discounts'].astype(str).str.replace('-', 'N/A')
 
-# rename column names to include $, remove $ from values for easier data manipulation
+# rename column names to include $, remove $ from cells for easier data manipulation
 data.columns = [f'{column} ($)' 
                 if column in ['Units Sold', 'Manufacturing Price', 'Sale Price', 
                               'Gross Sales', 'Discounts', 'COGS','Profit'] 
