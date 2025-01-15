@@ -27,5 +27,6 @@ data.columns = [f'{column} ($)'
 for column in data.columns:
     data[column] = data[column].replace({'\$': ''}, regex = True)
 
-
+# to do:
+# move date to the front and sort by that column, ascending order
 data.head()
