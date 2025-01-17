@@ -1,6 +1,7 @@
 # Importing libraries
 import pandas as pd
-import matplotlib as plt
+from dash import Dash, html, dcc
+import plotly.express as px
 
 # Data loading
 data = pd.read_csv(r'https://raw.githubusercontent.com/automat9/Projects/refs/heads/master/University%20Projects/Programming%20for%20Business%20Analytics/coffee%20company/dataset.csv')
@@ -18,15 +19,37 @@ data.rename(columns={'Sales':'Net Sales ($)'}, inplace = True)
 # replace "-" with "N/A" in the discount column for clarity
 data['Discounts'] = data['Discounts'].astype(str).str.replace('-', 'N/A')
 
-# rename column names to include $, remove $ from cells for easier data manipulation
+# rename column names to include ($)
 data.columns = [f'{column} ($)' 
                 if column in ['Units Sold', 'Manufacturing Price', 'Sale Price', 
                               'Gross Sales', 'Discounts', 'COGS','Profit'] 
                 else column for column in data.columns]
 
+# remove $ from cells for easier data manipulation
 for column in data.columns:
     data[column] = data[column].replace({'\$': ''}, regex = True)
 
-# to do:
-# move date to the front and sort by that column, ascending order
+# move date and product to the front
+data = data[['Date', 'Product'] + [column for column in data.columns if column != 'Date' and column != 'Product']]
+
+# sort by date, ascending order
+data = data.sort_values(by='Date', ascending = True)
+
+# reset index (to reflect the new order)
+data = data.reset_index(drop = True)
+
+# convert all columns containing numbers to numeric (INCOMPLETE)
+for column in ['Profit ($)', 'Sales ($)', 'Gross Sales ($)', 'Discounts ($)', 'COGS ($)']:
+    if column in data.columns:
+        data[column] = data[column].replace({',': ''}, regex=True).astype(float)
+
+
+
+
+### Data Analysis
+# mean etc
+
+### Data Visualisation
+
+
 data.head()
