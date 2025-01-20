@@ -1,5 +1,6 @@
 # Importing libraries
 import pandas as pd
+import numpy as np
 from dash import Dash, html, dcc
 import plotly.express as px
 
@@ -16,9 +17,6 @@ data.drop(columns=['Month Number','Month Name','Year'], inplace = True)
 # rename Sales to Net Sales for clarity
 data.rename(columns={'Sales':'Net Sales ($)'}, inplace = True)
 
-# replace "-" with "N/A" in the discount column for clarity
-data['Discounts'] = data['Discounts'].astype(str).str.replace('-', 'N/A')
-
 # rename column names to include ($)
 data.columns = [f'{column} ($)' 
                 if column in ['Units Sold', 'Manufacturing Price', 'Sale Price', 
@@ -27,7 +25,7 @@ data.columns = [f'{column} ($)'
 
 # remove $ from cells for easier data manipulation
 for column in data.columns:
-    data[column] = data[column].replace({'\$': ''}, regex = True)
+    data[column] = data[column].replace({'\\$': ''}, regex = True)
 
 # move date and product to the front
 data = data[['Date', 'Product'] + [column for column in data.columns if column != 'Date' and column != 'Product']]
@@ -38,11 +36,19 @@ data = data.sort_values(by='Date', ascending = True)
 # reset index (to reflect the new order)
 data = data.reset_index(drop = True)
 
-# convert all columns containing numbers to numeric (INCOMPLETE)
+# further data cleaning
 for column in ['Profit ($)', 'Sales ($)', 'Gross Sales ($)', 'Discounts ($)', 'COGS ($)']:
     if column in data.columns:
-        data[column] = data[column].replace({',': ''}, regex=True).astype(float)
-
+        data[column] = (data[column]
+                        .astype(str) # convert to string to use .str methods
+                        .str.strip()
+                        .str.replace('[()]', '', regex = True)
+                        .str.replace(',','')
+                        .str.replace('-','')
+                        .replace(['', 'N/A'], np.nan) # replace empty strings and N/A with NaN
+                        .astype(float))
+    
+# TODO: TRY TO MOVE $ REMOVAL TO FURTHER DATA CLEANING
 
 
 
@@ -50,6 +56,8 @@ for column in ['Profit ($)', 'Sales ($)', 'Gross Sales ($)', 'Discounts ($)', 'C
 # mean etc
 
 ### Data Visualisation
+# data processing
+
 
 
 data.head()
