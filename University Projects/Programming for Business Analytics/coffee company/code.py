@@ -4,8 +4,10 @@ import numpy as np
 from dash import Dash, html, dcc
 import plotly.express as px
 
+
+
 # Data loading
-data = pd.read_csv(r'https://raw.githubusercontent.com/automat9/Projects/refs/heads/master/University%20Projects/Programming%20for%20Business%20Analytics/coffee%20company/dataset.csv')
+data = pd.read_csv(r'https://raw.githubusercontent.com/automat9/Projects/refs/heads/master/University%20Projects/Programming%20for%20Business%20Analytics/coffee%20company/raw%20coffee%20dataset.csv')
 
 ### Data preparation
 # remove white space
@@ -23,10 +25,6 @@ data.columns = [f'{column} ($)'
                               'Gross Sales', 'Discounts', 'COGS','Profit'] 
                 else column for column in data.columns]
 
-# remove $ from cells for easier data manipulation
-for column in data.columns:
-    data[column] = data[column].replace({'\\$': ''}, regex = True)
-
 # move date and product to the front
 data = data[['Date', 'Product'] + [column for column in data.columns if column != 'Date' and column != 'Product']]
 
@@ -37,23 +35,33 @@ data = data.sort_values(by='Date', ascending = True)
 data = data.reset_index(drop = True)
 
 # further data cleaning
-for column in ['Profit ($)', 'Sales ($)', 'Gross Sales ($)', 'Discounts ($)', 'COGS ($)']:
+for column in ['Profit ($)', 'Net Sales ($)', 'Gross Sales ($)', 'Discounts ($)', 'Sale Price ($)', 'COGS ($)', 'Manufacturing Price ($)']:
     if column in data.columns:
         data[column] = (data[column]
                         .astype(str) # convert to string to use .str methods
                         .str.strip()
-                        .str.replace('[()]', '', regex = True)
+                        .replace({'\\$': ''}, regex = True)
                         .str.replace(',','')
                         .str.replace('-','')
-                        .replace(['', 'N/A'], np.nan) # replace empty strings and N/A with NaN
+                        .replace(r'\((.*?)\)', r'-\1', regex=True) # AI generated (represents negatives with - instead of ())
+                        .replace(['', 'N/A'], '0') # replace empty strings and N/A with NaN
                         .astype(float))
     
-# TODO: TRY TO MOVE $ REMOVAL TO FURTHER DATA CLEANING
-
-
-
 ### Data Analysis
-# mean etc
+pd.options.display.float_format = '{:,.2f}'.format # two decimal places instead of x.xxxe+03
+
+print(data.describe()) # eyeball analysis
+
+questionable_units = data[data['Profit ($)'] <= 0].shape[0]
+print(f'Total number of units with no profit or a loss {questionable_units}')
+
+
+
+"""
+Findings:
+Total number of units with no profit or a loss 144
+
+"""
 
 ### Data Visualisation
 # data processing
