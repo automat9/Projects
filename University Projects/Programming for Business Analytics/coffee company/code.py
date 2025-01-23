@@ -21,7 +21,7 @@ data.rename(columns={'Sales':'Net Sales ($)'}, inplace = True)
 
 # rename column names to include ($)
 data.columns = [f'{column} ($)' 
-                if column in ['Units Sold', 'Manufacturing Price', 'Sale Price', 
+                if column in ['Manufacturing Price', 'Sale Price', 
                               'Gross Sales', 'Discounts', 'COGS','Profit'] 
                 else column for column in data.columns]
 
@@ -50,10 +50,33 @@ for column in ['Profit ($)', 'Net Sales ($)', 'Gross Sales ($)', 'Discounts ($)'
 ### Data Analysis
 pd.options.display.float_format = '{:,.2f}'.format # two decimal places instead of x.xxxe+03
 
-print(data.describe()) # eyeball analysis
+# initial eyeball analysis
+#print(data.describe())
 
-questionable_units = data[data['Profit ($)'] <= 0].shape[0]
-print(f'Total number of units with no profit or a loss {questionable_units}')
+# How many products generate no profit or a loss
+questionable_products = data[data['Profit ($)'] <= 0].shape[0]
+#print(f'Total number of products with no profit or a loss: {questionable_products}')
+
+# Most profitable Products
+most_profitable_products = data.nlargest(20, 'Profit ($)') # adjust to see more/fewer products
+#print(best_performing_products)
+
+# Worst Performing Products
+worst_performing_products = data.nsmallest(20, 'Profit ($)')
+#print(worst_performing_products)
+
+# Segments ranked
+segments = data.groupby('Segment', as_index = False)['Profit ($)'].sum().sort_values(by = 'Profit ($)', ascending = False)
+#print(segments)
+
+# Countries ranked
+countries = data.groupby('Country', as_index = False)['Profit ($)'].sum().sort_values(by = 'Profit ($)', ascending = False)
+#print(countries)
+
+# Segments and Countries sorted by profit
+ranked_segments_countries = data.groupby(['Segment', 'Country'], as_index = False)['Profit ($)'].sum().sort_values(by='Profit ($)', ascending=False)
+#print(ranked_segments_countries)
+
 
 
 
@@ -61,6 +84,7 @@ print(f'Total number of units with no profit or a loss {questionable_units}')
 Findings:
 Total number of units with no profit or a loss 144
 
+There are many more products that generate a loss than those that generate exceptionally high sales
 """
 
 ### Data Visualisation
@@ -68,4 +92,4 @@ Total number of units with no profit or a loss 144
 
 
 
-data.head()
+#data.head()
