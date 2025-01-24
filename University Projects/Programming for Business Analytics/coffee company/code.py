@@ -61,30 +61,64 @@ questionable_products = data[data['Profit ($)'] <= 0].shape[0]
 most_profitable_products = data.nlargest(20, 'Profit ($)') # adjust to see more/fewer products
 #print(best_performing_products)
 
-# Worst Performing Products
-worst_performing_products = data.nsmallest(20, 'Profit ($)')
-#print(worst_performing_products)
+# Loss Generating Products
+loss_generating_products = data.nsmallest(20, 'Profit ($)')
+#print(loss_generating_products)
 
-# Segments ranked
-segments = data.groupby('Segment', as_index = False)['Profit ($)'].sum().sort_values(by = 'Profit ($)', ascending = False)
+# Profit Margin per Segment
+segments = data.groupby('Segment')['Profit ($)'].sum().sort_values(ascending = False)
 #print(segments)
 
-# Countries ranked
-countries = data.groupby('Country', as_index = False)['Profit ($)'].sum().sort_values(by = 'Profit ($)', ascending = False)
+# Profit Margin per Country
+countries = data.groupby('Country')['Profit ($)'].sum().sort_values(ascending = False)
 #print(countries)
 
-# Segments and Countries sorted by profit
-ranked_segments_countries = data.groupby(['Segment', 'Country'], as_index = False)['Profit ($)'].sum().sort_values(by='Profit ($)', ascending=False)
-#print(ranked_segments_countries)
+# Segments and Countries sorted by Profit
+segments_countries = data.groupby(['Segment', 'Country'])['Profit ($)'].sum().sort_values(ascending=False)
+#print(segments_countries)
+
+# Discount Band Impact on Sales and Profit
+discount_impact = data.groupby('Discount Band').agg(
+    total_units_sold = ('Units Sold', 'sum'),
+    total_profit= ('Profit ($)', 'sum'))
+
+discount_impact['average_profit_per_unit'] = (discount_impact['total_profit'] / discount_impact['total_units_sold'])
+#print(discount_impact)
 
 
+#TODO
+"""
+COGS vs. Sales:
+Compare COGS ($) to Net Sales ($) to evaluate cost efficiency.
 
+Customer Segmentation:
+Analyze segment-based performance trends.
+
+Country-wise Performance:
+Explore geographical performance for revenue and profit.
+
+Correlation Analysis:
+Investigate relationships between Discounts ($), Gross Sales ($), and Profit ($).
+
+Forecasting:
+Use Date and sales data for time series forecasting of future sales.
+
+Outlier Detection:
+Identify anomalies in Profit ($) or Discounts ($).
+"""
 
 """
 Findings:
 Total number of units with no profit or a loss 144
 
+Beverages is the most profitable segment, Packaged and Prepared Food only generates a loss
+
 There are many more products that generate a loss than those that generate exceptionally high sales
+
+
+
+
+The 'Low' discount band has the highest average profit per unit
 """
 
 ### Data Visualisation
