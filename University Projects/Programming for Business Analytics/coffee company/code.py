@@ -85,12 +85,18 @@ discount_impact = data.groupby('Discount Band').agg(
 discount_impact['average_profit_per_unit'] = (discount_impact['total_profit'] / discount_impact['total_units_sold'])
 #print(discount_impact)
 
+# Cost Efficiency 
+data['COGS Ratio (%)'] = (data['COGS ($)'] / data['Net Sales ($)'])
+#print(data[['Units Sold', 'Manufacturing Price ($)','COGS ($)', 'Net Sales ($)', 'COGS Ratio (%)']].head())
+
+threshold = 0.9
+high_cogs_ratio = data.loc[data['COGS Ratio (%)'] > threshold, 'COGS Ratio (%)'].count()
+#print(f"Total number of high COGS ratio products: {high_cogs_ratio} / {data['COGS Ratio (%)'].count()}")
+#print(f"Proportion of products that have high COGS ratio: {high_cogs_ratio / data['COGS Ratio (%)'].count()}")
+
 
 #TODO
 """
-COGS vs. Sales:
-Compare COGS ($) to Net Sales ($) to evaluate cost efficiency.
-
 Customer Segmentation:
 Analyze segment-based performance trends.
 
@@ -109,16 +115,19 @@ Identify anomalies in Profit ($) or Discounts ($).
 
 """
 Findings:
+Not all data is included (e.g. for index 0, COGS appears as $21,040.50, but COGS = Units Sold x Manufacturing Price = $9,468.23?)
+
 Total number of units with no profit or a loss 144
 
 Beverages is the most profitable segment, Packaged and Prepared Food only generates a loss
 
 There are many more products that generate a loss than those that generate exceptionally high sales
 
-
-
-
 The 'Low' discount band has the highest average profit per unit
+
+COGS of 21.52% of products are 90% or above, indicating low profitability
+
+
 """
 
 ### Data Visualisation
@@ -126,4 +135,4 @@ The 'Low' discount band has the highest average profit per unit
 
 
 
-#data.head()
+data.head()
