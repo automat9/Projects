@@ -1,40 +1,45 @@
-# Importing libraries
+# Import Libraries
 import pandas as pd
 import numpy as np
 from dash import Dash, html, dcc
 import plotly.express as px
 
+# Settings
+pd.options.display.float_format = '{:,.2f}'.format # adds thousands separator and rounds numbers to two decimal places instead of x.xxxe+03
+pd.set_option('display.expand_frame_repr', False)
 
-
-# Data loading
+# Data Loading
 data = pd.read_csv(r'https://raw.githubusercontent.com/automat9/Projects/refs/heads/master/University%20Projects/Programming%20for%20Business%20Analytics/coffee%20company/raw%20coffee%20dataset.csv')
 
-### Data preparation
-# remove white space
+### Data Preparation
+# Remove Extra Space from Column Names
 data.columns = data.columns.str.strip()
 
-# remove unnecessary columns as there is already a date column, inplace permanently changes the original dataset
+# Remove Extra Space from Columns Containing String Values 
+data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x) # AI generated
+
+# Remove Unnecessary Columns as There is Already a Date Column, Inplace Permanently Changes the Original Dataset
 data.drop(columns=['Month Number','Month Name','Year'], inplace = True)
 
-# rename Sales to Net Sales for clarity
+# Rename Sales to Net Sales for Clarity
 data.rename(columns={'Sales':'Net Sales ($)'}, inplace = True)
 
-# rename column names to include ($)
+# Rename Column names to Include ($)
 data.columns = [f'{column} ($)' 
                 if column in ['Manufacturing Price', 'Sale Price', 
                               'Gross Sales', 'Discounts', 'COGS','Profit'] 
                 else column for column in data.columns]
 
-# move date and product to the front
+# Move Date and Product to the Front
 data = data[['Date', 'Product'] + [column for column in data.columns if column != 'Date' and column != 'Product']]
 
-# sort by date, ascending order
+# Sort by Date, Ascending Order
 data = data.sort_values(by='Date', ascending = True)
 
-# reset index (to reflect the new order)
+# Reset Index (to reflect the new order)
 data = data.reset_index(drop = True)
 
-# further data cleaning
+# Further Data Cleaning
 for column in ['Profit ($)', 'Net Sales ($)', 'Gross Sales ($)', 'Discounts ($)', 'Sale Price ($)', 'COGS ($)', 'Manufacturing Price ($)']:
     if column in data.columns:
         data[column] = (data[column]
@@ -46,23 +51,21 @@ for column in ['Profit ($)', 'Net Sales ($)', 'Gross Sales ($)', 'Discounts ($)'
                         .replace(r'\((.*?)\)', r'-\1', regex=True) # AI generated (represents negatives with - instead of ())
                         .replace(['', 'N/A'], '0') # replace empty strings and N/A with NaN
                         .astype(float))
-    
-### Data Analysis
-pd.options.display.float_format = '{:,.2f}'.format # two decimal places instead of x.xxxe+03
 
-# initial eyeball analysis
+### Data Analysis
+# Initial Eyeball Analysis
 #print(data.describe())
 
-# How many products generate no profit or a loss
+# How many Products Generate no Profit or a Loss
 questionable_products = data[data['Profit ($)'] <= 0].shape[0]
 #print(f'Total number of products with no profit or a loss: {questionable_products}')
 
-# Most profitable Products
-most_profitable_products = data.nlargest(20, 'Profit ($)') # adjust to see more/fewer products
-#print(best_performing_products)
+# Most Profitable Products
+most_profitable_products = data.nlargest(5, 'Profit ($)') # adjust to see more/fewer products
+#print(most_profitable_products)
 
 # Loss Generating Products
-loss_generating_products = data.nsmallest(20, 'Profit ($)')
+loss_generating_products = data.nsmallest(5, 'Profit ($)')
 #print(loss_generating_products)
 
 # Profit Margin per Segment
@@ -74,7 +77,7 @@ countries = data.groupby('Country')['Profit ($)'].sum().sort_values(ascending = 
 #print(countries)
 
 # Segments and Countries sorted by Profit
-segments_countries = data.groupby(['Segment', 'Country'])['Profit ($)'].sum().sort_values(ascending=False)
+segments_countries = data.groupby(['Segment', 'Country'])['Profit ($)'].sum().sort_values(ascending = False)
 #print(segments_countries)
 
 # Discount Band Impact on Sales and Profit
@@ -94,12 +97,19 @@ high_cogs_ratio = data.loc[data['COGS Ratio (%)'] > threshold, 'COGS Ratio (%)']
 #print(f"Total number of high COGS ratio products: {high_cogs_ratio} / {data['COGS Ratio (%)'].count()}")
 #print(f"Proportion of products that have high COGS ratio: {high_cogs_ratio / data['COGS Ratio (%)'].count()}")
 
+# Customer Segmentation
+segment_analysis = data.groupby('Segment').agg({
+    'Units Sold': 'sum',
+    'Gross Sales ($)': 'sum',
+    'Net Sales ($)': 'sum',
+    'Profit ($)': 'sum'})
+
+segment_analysis['Profit Margin (%)'] = (segment_analysis['Profit ($)'] / segment_analysis['Net Sales ($)']) * 100
+segment_analysis = segment_analysis.sort_values(by = 'Profit Margin (%)', ascending = False)
+#print(segment_analysis)
 
 #TODO
 """
-Customer Segmentation:
-Analyze segment-based performance trends.
-
 Country-wise Performance:
 Explore geographical performance for revenue and profit.
 
@@ -115,7 +125,7 @@ Identify anomalies in Profit ($) or Discounts ($).
 
 """
 Findings:
-Not all data is included (e.g. for index 0, COGS appears as $21,040.50, but COGS = Units Sold x Manufacturing Price = $9,468.23?)
+Missing Costs (e.g. for index 0, COGS appears as $21,040.50, but COGS = Units Sold x Manufacturing Price = $9,468.23?)
 
 Total number of units with no profit or a loss 144
 
@@ -127,6 +137,7 @@ The 'Low' discount band has the highest average profit per unit
 
 COGS of 21.52% of products are 90% or above, indicating low profitability
 
+The profit margin of the Packaged and Prepared Foods Segment is -2.08%
 
 """
 
@@ -134,5 +145,5 @@ COGS of 21.52% of products are 90% or above, indicating low profitability
 # data processing
 
 
-
-data.head()
+#data.query("`Profit ($)` > 50000 and Country == 'China' and `COGS Ratio (%)` > 0.9")
+#data.head()
