@@ -6,7 +6,7 @@ import plotly.express as px
 
 # Settings
 pd.options.display.float_format = '{:,.2f}'.format # adds thousands separator and rounds numbers to two decimal places instead of x.xxxe+03
-pd.set_option('display.expand_frame_repr', False)
+pd.set_option('display.expand_frame_repr', False) # output display settings
 
 # Data Loading
 data = pd.read_csv(r'https://raw.githubusercontent.com/automat9/Projects/refs/heads/master/University%20Projects/Programming%20for%20Business%20Analytics/coffee%20company/raw%20coffee%20dataset.csv')
@@ -52,6 +52,9 @@ for column in ['Profit ($)', 'Net Sales ($)', 'Gross Sales ($)', 'Discounts ($)'
                         .replace(['', 'N/A'], '0') # replace empty strings and N/A with NaN
                         .astype(float))
 
+# Create a COGS Ratio Column
+data['COGS Ratio (%)'] = (data['COGS ($)'] / data['Net Sales ($)']) * 100
+
 ### Data Analysis
 # Initial Eyeball Analysis
 #print(data.describe())
@@ -89,7 +92,6 @@ discount_impact['average_profit_per_unit'] = (discount_impact['total_profit'] / 
 #print(discount_impact)
 
 # Cost Efficiency 
-data['COGS Ratio (%)'] = (data['COGS ($)'] / data['Net Sales ($)'])
 #print(data[['Units Sold', 'Manufacturing Price ($)','COGS ($)', 'Net Sales ($)', 'COGS Ratio (%)']].head())
 
 threshold = 0.9
@@ -97,7 +99,11 @@ high_cogs_ratio = data.loc[data['COGS Ratio (%)'] > threshold, 'COGS Ratio (%)']
 #print(f"Total number of high COGS ratio products: {high_cogs_ratio} / {data['COGS Ratio (%)'].count()}")
 #print(f"Proportion of products that have high COGS ratio: {high_cogs_ratio / data['COGS Ratio (%)'].count()}")
 
-# Customer Segmentation
+# Profit Margin per Segment
+segments = data.groupby('Segment')['Profit ($)'].sum().sort_values(ascending = False)
+#print(segments)
+
+# Full Segment Analysis
 segment_analysis = data.groupby('Segment').agg({
     'Units Sold': 'sum',
     'Gross Sales ($)': 'sum',
@@ -108,11 +114,36 @@ segment_analysis['Profit Margin (%)'] = (segment_analysis['Profit ($)'] / segmen
 segment_analysis = segment_analysis.sort_values(by = 'Profit Margin (%)', ascending = False)
 #print(segment_analysis)
 
+# Profit Margin per Country
+countries = data.groupby('Country')['Profit ($)'].sum().sort_values(ascending = False)
+#print(countries)
+
+# Full Country-wise Performance
+country_performance = data.groupby("Country").agg({
+    'Units Sold': 'sum',
+    'Gross Sales ($)': 'sum',
+    'Net Sales ($)': 'sum',
+    'Profit ($)': 'sum'})
+
+country_performance['Profit Margin (%)'] = (country_performance['Profit ($)'] / country_performance['Net Sales ($)']) * 100
+country_performance = country_performance.sort_values(by = "Profit Margin (%)", ascending=False)
+#print(country_performance)
+
+# Full Segments and Countries Analysis
+segments_countries = data.groupby(['Segment', 'Country']).agg({
+    'Profit ($)': 'sum',
+    'Net Sales ($)': 'sum'})
+
+segments_countries['Profit Margin (%)'] = (segments_countries['Profit ($)'] / segments_countries['Net Sales ($)']) * 100
+
+segments_countries = segments_countries.sort_values(by='Profit Margin (%)', ascending=False)
+#print(segments_countries)
+
+
+
+
 #TODO
 """
-Country-wise Performance:
-Explore geographical performance for revenue and profit.
-
 Correlation Analysis:
 Investigate relationships between Discounts ($), Gross Sales ($), and Profit ($).
 
@@ -137,8 +168,11 @@ The 'Low' discount band has the highest average profit per unit
 
 COGS of 21.52% of products are 90% or above, indicating low profitability
 
-The profit margin of the Packaged and Prepared Foods Segment is -2.08%
+The worst profit margin is that of the Packaged and Prepared Foods segment: -2.08%
+The best profit margin is that of the DIary Products segment: 56.32%
 
+The worst profit margin is that of China: 9.44%
+The best profit margin is that of Japan 11.88%
 """
 
 ### Data Visualisation
