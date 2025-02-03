@@ -139,20 +139,36 @@ segments_countries['Profit Margin (%)'] = (segments_countries['Profit ($)'] / se
 segments_countries = segments_countries.sort_values(by='Profit Margin (%)', ascending=False)
 #print(segments_countries)
 
+# Correlation Analysis
+correlation = ['Discounts ($)', 'Gross Sales ($)', 'Profit ($)']
+#print(data[correlation].corr())
 
+# Outlier Detection in Profit and Discounts
+profit_q1 = data['Profit ($)'].quantile(0.25)
+profit_q3 = data['Profit ($)'].quantile(0.75)
+discount_q1 = data['Discounts ($)'].quantile(0.25)
+discount_q3 = data['Discounts ($)'].quantile(0.75)
+
+profit_iqr = profit_q3 - profit_q1
+discount_iqr = discount_q3 - discount_q1
+
+lower_bound_profit = profit_q1 - 1.5 * profit_iqr
+upper_bound_profit = profit_q3 + 1.5 * profit_iqr
+lower_bound_discount = discount_q1 - 1.5 * discount_iqr
+upper_bound_discount = discount_q3 + 1.5 * discount_iqr 
+
+profit_outliers = data[(data['Profit ($)'] < lower_bound_profit) | (data['Profit ($)'] > upper_bound_profit)]
+discount_outliers = data[(data['Discounts ($)'] < lower_bound_discount) | (data['Discounts ($)'] > upper_bound_discount)]
+
+#print("Number of outliers in Profit:", profit_outliers.shape[0])
+#print(profit_outliers[['Profit ($)']])
+#print("Number of outliers in Discounts:", discount_outliers.shape[0])
+#print(discount_outliers[['Discounts ($)']])
 
 
 #TODO
-"""
-Correlation Analysis:
-Investigate relationships between Discounts ($), Gross Sales ($), and Profit ($).
+# Visualisation 
 
-Forecasting:
-Use Date and sales data for time series forecasting of future sales.
-
-Outlier Detection:
-Identify anomalies in Profit ($) or Discounts ($).
-"""
 
 """
 Findings:
