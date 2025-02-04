@@ -170,6 +170,8 @@ discount_outliers = data[(data['Discounts ($)'] < lower_bound_discount) | (data[
 # Visualisation 
 
 
+
+
 """
 Findings:
 Missing Costs (e.g. for index 0, COGS appears as $21,040.50, but COGS = Units Sold x Manufacturing Price = $9,468.23?)
