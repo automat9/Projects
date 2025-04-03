@@ -166,12 +166,6 @@ discount_outliers = data[(data['Discounts ($)'] < lower_bound_discount) | (data[
 #print(discount_outliers[['Discounts ($)']])
 
 
-#TODO
-# Visualisation 
-
-
-
-
 """
 Findings:
 Missing Costs (e.g. for index 0, COGS appears as $21,040.50, but COGS = Units Sold x Manufacturing Price = $9,468.23?)
@@ -195,7 +189,6 @@ The best profit margin is that of Japan 11.88%
 
 ### Data Visualisation
 # data processing
-
 
 #data.query("`Profit ($)` > 50000 and Country == 'China' and `COGS Ratio (%)` > 0.9")
 #data.head()
